@@ -1,0 +1,21 @@
+# 编译产物
+*.class
+*.apk
+*.aar
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+*.dex
+/build
+/*/build
+/local.properties
+/.gradle
+/captures
+.externalNativeBuild
+
+# 本地 IDE
+*.iml
+.idea/
+.DS_Store
+.settings/
+.project
+.classpath

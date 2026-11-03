@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">银盾</string>
+    <string name="accessibility_desc">银盾通过安卓「无障碍服务」自动点击广告本身提供的“跳过 / 关闭”按钮，帮长辈跳过开屏广告与应用内弹窗。本应用仅自动点击界面上已存在的按钮，不破解、不屏蔽、不删除广告。规则通过联网自动更新。</string>
+    <string name="status_on">无障碍服务：已开启</string>
+    <string name="status_off">已停止</string>
+    <string name="btn_settings">⚙ 设置</string>
+    <string name="btn_stats">📊 守护统计</string>
+    <string name="tip_dont_kill">请保持本应用后台运行，并加入“电池优化白名单”与“自启动”名单，否则跳广告会失效。</string>
+
+    <!-- 三态自检文案 -->
+    <string name="status_running">运行中</string>
+    <string name="status_stopped">开关已开，但服务可能已被系统停止</string>
+    <string name="hint_running">银盾正在后台工作，无需任何操作。</string>
+    <string name="hint_off">请点击下方「设置」，在系统“无障碍”列表中找到“银盾”并开启开关。</string>
+    <string name="hint_stopped">请保持本应用后台运行：进入“设置→应用管理→银盾”，开启自启动、并把省电策略设为“无限制”。</string>
+
+    <!-- 四态自检：细分故障定位 -->
+    <string name="status_no_connect">开关已开，但服务未成功启动</string>
+    <string name="hint_no_connect">这是系统的绑定问题，两步解决：① 回到手机“无障碍”设置，把银盾开关关掉再打开；② 若仍不行，重启手机后再开一次。</string>
+    <string name="status_no_event">服务已启动，但收不到屏幕事件</string>
+    <string name="hint_no_event">系统阻止了事件上报。请检查：设置→应用管理→银盾→自启动是否开启；省电策略是否为“无限制”。</string>
+    <string name="diag_title">运行诊断</string>
+
+    <!-- 跳过提示开关 -->
+    <string name="skip_toast_title">跳过时显示提示</string>
+    <string name="skip_toast_summary">每次自动跳过广告后，弹出一个轻量提示（默认开）</string>
+
+    <!-- 统计页（v1.4.3：文案统一改为「守护」） -->
+    <string name="stats_today">今日守护</string>
+    <string name="stats_total">累计守护</string>
+    <string name="stats_empty">（暂无记录，开启服务后使用手机会自动统计）</string>
+    <string name="stats_share_title">分享给子女 / 家人</string>
+</resources>

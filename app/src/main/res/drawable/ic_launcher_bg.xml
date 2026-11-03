@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- 银灰渐变背景（v1.5.6，与首页徽标 bg_icon_silver 同步略加深），
+         衬托金属光泽银边的白盾蓝芯 -->
+    <gradient
+        android:angle="135"
+        android:startColor="#EAEFF2"
+        android:endColor="#7E93A1"
+        android:type="linear" />
+</shape>

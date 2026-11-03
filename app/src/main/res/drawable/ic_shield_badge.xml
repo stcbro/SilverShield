@@ -1,0 +1,29 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- 首页徽标盾 v1.5.6：与启动图标同一套金属光泽设计，盾形放大占满徽标 -->
+    <path
+        android:fillColor="#6E828D"
+        android:pathData="M12 3.2 L19.04 5.84 V11.12 C19.04 15.52 15.96 19.48 12 20.8 C8.04 19.48 4.96 15.52 4.96 11.12 V5.84 Z" />
+    <path android:pathData="M12 3.9 L18.48 6.33 V11.19 C18.48 15.24 15.64 18.88 12 20.1 C8.36 18.88 5.52 15.24 5.52 11.19 V6.33 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="12"
+                android:startY="3.9"
+                android:endX="12"
+                android:endY="20.1"
+                android:startColor="#FBFCFD"
+                android:endColor="#9FB3BE" />
+        </aapt:attr>
+    </path>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12 4.96 L17.63 7.07 V11.3 C17.63 14.82 15.17 17.99 12 19.04 C8.83 17.99 6.37 14.82 6.37 11.3 V7.07 Z" />
+    <path
+        android:fillColor="#2196F3"
+        android:pathData="M12 7.03 L15.87 8.48 V11.39 C15.87 13.81 14.18 15.99 12 16.71 C9.82 15.99 8.13 13.81 8.13 11.39 V8.48 Z" />
+</vector>

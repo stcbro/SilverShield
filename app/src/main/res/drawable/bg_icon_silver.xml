@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <!-- 银盾徽标底 v1.5.6：银灰渐变略加深，衬托白盾与金属环 -->
+    <gradient
+        android:angle="135"
+        android:startColor="#EAEFF2"
+        android:endColor="#7E93A1"
+        android:type="linear" />
+</shape>

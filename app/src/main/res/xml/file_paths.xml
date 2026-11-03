@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- 升级包下载目录：getExternalFilesDir(DIRECTORY_DOWNLOADS) = files/Download（大写 D）
+         这里用 path="." 覆盖整个外部私有 files 目录，避免大小写不一致导致 FileProvider 抛异常 -->
+    <external-files-path name="updates" path="." />
+    <!-- 兜底：应用内部 files 目录 -->
+    <files-path name="internal_updates" path="." />
+</paths>

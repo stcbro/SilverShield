@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- v1.5.5：银灰渐变底（同首页徽标）+ 钢灰描边白盾蓝芯 -->
+    <background android:drawable="@drawable/ic_launcher_bg" />
+    <foreground android:drawable="@drawable/ic_shield_fg" />
+</adaptive-icon>

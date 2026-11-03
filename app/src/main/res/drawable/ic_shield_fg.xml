@@ -1,0 +1,30 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- 银盾前景 v1.5.6：黑边改为金属光泽银边 -->
+    <!-- 结构（外→内）：软灰细定形线 → 银白渐变金属环 → 白盾 → 蓝芯 -->
+    <path
+        android:fillColor="#6E828D"
+        android:pathData="M12 5.8 L16.96 7.66 V11.38 C16.96 14.48 14.79 17.27 12 18.2 C9.21 17.27 7.04 14.48 7.04 11.38 V7.66 Z" />
+    <path android:pathData="M12 6.3 L16.56 8.01 V11.43 C16.56 14.28 14.57 16.85 12 17.7 C9.43 16.85 7.44 14.28 7.44 11.43 V8.01 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="12"
+                android:startY="6.3"
+                android:endX="12"
+                android:endY="17.7"
+                android:startColor="#FBFCFD"
+                android:endColor="#9FB3BE" />
+        </aapt:attr>
+    </path>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12 7.04 L15.97 8.53 V11.5 C15.97 13.98 14.23 16.22 12 16.96 C9.77 16.22 8.03 13.98 8.03 11.5 V8.53 Z" />
+    <path
+        android:fillColor="#2196F3"
+        android:pathData="M12 8.50 L14.73 9.52 V11.57 C14.73 13.27 13.53 14.81 12 15.32 C10.47 14.81 9.27 13.27 9.27 11.57 V9.52 Z" />
+</vector>

@@ -1,0 +1,131 @@
+[
+  {
+    "pkg": "com.qihoo360.mobilesafe",
+    "name": "360手机卫士",
+    "note": "清理/安全类，开屏广告与升级/会员弹窗密集，老人易被诱导点击",
+    "rule": {
+      "popup_rules": [
+        { "id": "+立即升级", "action": "+以后再说" },
+        { "id": "+立即更新", "action": "+以后再说" },
+        { "id": "+开通会员", "action": "+放弃" },
+        { "id": "+领取福利", "action": "+关闭" },
+        { "id": "+开启防护", "action": "+暂不开启" }
+      ],
+      "keywords": ["跳过", "跳过广告", "关闭广告"],
+      "package_name": "com.qihoo360.mobilesafe",
+      "min_start_delay": 0
+    }
+  },
+  {
+    "pkg": "com.cleanmaster.mguard_cn",
+    "name": "猎豹清理大师",
+    "note": "清理类，开屏广告与各类“加速/会员”弹窗密集",
+    "rule": {
+      "popup_rules": [
+        { "id": "+立即清理", "action": "+以后再说" },
+        { "id": "+立即升级", "action": "+以后再说" },
+        { "id": "+开通会员", "action": "+放弃" },
+        { "id": "+领取礼包", "action": "+关闭" }
+      ],
+      "keywords": ["跳过", "跳过广告", "关闭广告"],
+      "package_name": "com.cleanmaster.mguard_cn",
+      "min_start_delay": 0
+    }
+  },
+  {
+    "pkg": "com.qihoo.cleandroid_cn",
+    "name": "360清理大师",
+    "note": "清理类，开屏广告与会员弹窗密集",
+    "rule": {
+      "popup_rules": [
+        { "id": "+立即升级", "action": "+以后再说" },
+        { "id": "+开通会员", "action": "+放弃" },
+        { "id": "+领取福利", "action": "+关闭" }
+      ],
+      "keywords": ["跳过", "跳过广告", "关闭广告"],
+      "package_name": "com.qihoo.cleandroid_cn",
+      "min_start_delay": 0
+    }
+  },
+  {
+    "pkg": "cn.opda.a.phonoalbumshoushou",
+    "name": "百度手机卫士",
+    "note": "安全类，开屏广告与各类“防护/会员”弹窗",
+    "rule": {
+      "popup_rules": [
+        { "id": "+立即升级", "action": "+以后再说" },
+        { "id": "+开通会员", "action": "+放弃" },
+        { "id": "+开启防护", "action": "+暂不开启" }
+      ],
+      "keywords": ["跳过", "跳过广告", "关闭广告"],
+      "package_name": "cn.opda.a.phonoalbumshoushou",
+      "min_start_delay": 0
+    }
+  },
+  {
+    "pkg": "com.phoenix.read",
+    "name": "红果短剧",
+    "note": "短剧类，开屏与“看广告解锁”页面广告极密集，老人易误触下载/充值",
+    "rule": {
+      "popup_rules": [
+        { "id": "+立即开通", "action": "+暂不" },
+        { "id": "+开通会员", "action": "+放弃" },
+        { "id": "+领取红包", "action": "+关闭" }
+      ],
+      "keywords": ["跳过", "跳过广告", "关闭广告", "跳过 >>"],
+      "package_name": "com.phoenix.read",
+      "min_start_delay": 0
+    }
+  },
+  {
+    "pkg": "com.qsmy.walkmonkey",
+    "name": "步多多（走路赚钱）",
+    "note": "现金奖励类，开屏与“领红包/金币”弹窗密集，老人易被诱导",
+    "rule": {
+      "popup_rules": [
+        { "id": "+立即升级", "action": "+以后再说" },
+        { "id": "+开通会员", "action": "+放弃" },
+        { "id": "+领取红包", "action": "+关闭" }
+      ],
+      "keywords": ["跳过", "跳过广告", "关闭广告"],
+      "package_name": "com.qsmy.walkmonkey",
+      "min_start_delay": 0
+    }
+  },
+  {
+    "pkg": "com.juanvision.eseecloud30",
+    "name": "易视云（IP Pro 监控）",
+    "note": "监控类 App，开屏广告长且“跳过”按钮隐蔽，老人看监控前被迫看广告",
+    "rule": {
+      "popup_rules": [
+        { "id": "+立即升级", "action": "+以后再说" },
+        { "id": "+立即更新", "action": "+以后再说" },
+        { "id": "+开启云存储", "action": "+放弃" },
+        { "id": "+开通云存储", "action": "+放弃" },
+        { "id": "+限时优惠", "action": "+关闭" }
+      ],
+      "keywords": ["跳过", "关闭广告", "跳过广告"],
+      "package_name": "com.juanvision.eseecloud30",
+      "min_start_delay": 0
+    }
+  },
+  {
+    "pkg": "com.cainiao.wireless",
+    "name": "菜鸟",
+    "note": "物流类高频 App，双11/大促开屏广告（跳过倒计时）与领券、升级弹窗密集，老人查快递被迫看广告",
+    "rule": {
+      "popup_rules": [
+        { "id": "+新版本", "action": "+取消" },
+        { "id": "dialog_full_image", "action": "dialog_full_image_close" },
+        { "id": "+立即更新", "action": "+以后再说" },
+        { "id": "+立即升级", "action": "+以后再说" },
+        { "id": "+发现新版本", "action": "+稍后" },
+        { "id": "+立即领取", "action": "+关闭" },
+        { "id": "+限时领取", "action": "+关闭" }
+      ],
+      "keywords": ["跳过", "跳过广告", "关闭广告", "关闭"],
+      "package_name": "com.cainiao.wireless",
+      "min_start_delay": 0
+    }
+  }
+]
