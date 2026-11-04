@@ -1,6 +1,6 @@
 {
-  "versionCode": 55,
-  "versionName": "1.5.20",
-  "apkUrl": "https://gitee.com/stcbro/SilverShield/releases/download/v1.5.20-debug/SilverShield-v1.5.20.apk",
-  "notes": "首页标题下方加回一行小字副标题：帮长辈自动跳过开屏广告与烦人弹窗。"
+  "versionCode": 56,
+  "versionName": "1.5.21",
+  "apkUrl": "https://gitee.com/stcbro/SilverShield/releases/download/v1.5.21-debug/SilverShield-v1.5.21.apk",
+  "notes": "首页菜单图标左对齐：设置卡片与下方菜单行的图标统一左边缘。"
 }
