@@ -1,6 +1,6 @@
 {
-  "versionCode": 55,
-  "versionName": "1.5.20",
-  "apkUrl": "https://gitee.com/stcbro/SilverShield/releases/download/v1.5.20-debug/SilverShield-v1.5.20.apk",
-  "notes": "首页标题下方加回一行小字副标题：帮长辈自动跳过开屏广告与烦人弹窗。"
+  "versionCode": 57,
+  "versionName": "1.5.22",
+  "apkUrl": "https://gitee.com/stcbro/SilverShield/releases/download/v1.5.22-debug/SilverShield-v1.5.22.apk",
+  "notes": "① 修复百度地图开屏广告点了跳过没反应的问题；② 修复提交反馈时误弹「关闭广告成功」的问题。"
 }
