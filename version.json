@@ -1,6 +1,6 @@
 {
-  "versionCode": 56,
-  "versionName": "1.5.21",
-  "apkUrl": "https://gitee.com/stcbro/SilverShield/releases/download/v1.5.21-debug/SilverShield-v1.5.21.apk",
-  "notes": "首页菜单图标左对齐：设置卡片与下方菜单行的图标统一左边缘。"
+  "versionCode": 57,
+  "versionName": "1.5.22",
+  "apkUrl": "https://gitee.com/stcbro/SilverShield/releases/download/v1.5.22-debug/SilverShield-v1.5.22.apk",
+  "notes": "① 修复反馈页被自己误点的 bug（自身界面防护加固+分享面板排除）；② 百度地图开屏跳过修复：手势点按加长到 120ms 并补一次控件点击双保险，规则补充跳过关键词。"
 }

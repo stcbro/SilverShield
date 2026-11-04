@@ -140,7 +140,10 @@ public class SkipAccessibilityService extends AccessibilityService {
             "com.miui.notes", "com.miui.note", "com.android.notes", "com.sec.android.app.notes",
             "com.samsung.android.memo", "com.huawei.notepad", "com.hihonor.notepad",
             "com.coloros.note", "com.oppo.note", "com.vivo.notes", "com.heytap.note",
-            "com.example.android.notepad"
+            "com.example.android.notepad",
+            // v1.5.22：系统分享面板 / 系统解析器窗口——点「发送反馈」弹出的分享面板
+            // 若被扫描，面板里的应用名/按钮可能被误点导致分享刚弹出就被关掉
+            "com.android.internal.app", "android", "com.miui.mishare.connectivity"
     ));
 
     private final BroadcastReceiver updateReceiver = new BroadcastReceiver() {
@@ -408,6 +411,11 @@ public class SkipAccessibilityService extends AccessibilityService {
         // 防护：本应用与系统界面（自家界面有“跳过时显示提示”字样，会自己点自己）、
         // 桌面 / 输入法 / 安装器等系统界面，以及拨号 / 相机 / 支付等关键应用，永不扫描。
         if (pkg.isEmpty() || NO_SCAN_PACKAGES.contains(pkg) || PROTECTED_PACKAGES.contains(pkg)) {
+            return 0;
+        }
+        // v1.5.22：本应用任何变体（含 debug 后缀 / 提示浮层窗口）一律不扫，
+        // 彻底杜绝“反馈页/说明页被自己点自己”的问题（v1.5.20 用户实测复现）
+        if (pkg.contains("silvershield")) {
             return 0;
         }
         // 同一应用 300ms 内不重复全量扫描（事件风暴去抖）
@@ -1085,10 +1093,34 @@ public class SkipAccessibilityService extends AccessibilityService {
             if (BuildConfig.DEBUG) {
                 Log.i("SilverShieldSkip", "手势点按已派发");
             }
+            // v1.5.22：跳过路径双保险——手势之外再补一次 ACTION_CLICK。
+            // 部分广告 SDK（百度地图开屏实测）对手势不响应、只认控件点击事件；
+            // 跳过按钮连点两次无副作用，弹窗关闭路径保持只用手势防止误触。
+            if (!block) {
+                AccessibilityNodeInfo extra = findClickableAncestor(node, nr);
+                if (extra != null) {
+                    extra.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                    if (extra != node) {
+                        extra.recycle();
+                    }
+                }
+            }
             return;
         }
         // ② 手势失败（系统不支持/权限缺失）时，回退到无障碍点击：
         //    向上找最近的“按钮级”可点击节点；整屏容器可点则不点（避免误进广告）
+        AccessibilityNodeInfo clickTarget = findClickableAncestor(node, nr);
+        if (clickTarget != null) {
+            clickTarget.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+            if (clickTarget != node) {
+                clickTarget.recycle();
+            }
+        }
+    }
+
+    /** 向上找最近的“按钮级”可点击祖先节点（面积不超过命中区域 25 倍，防整屏容器误点）。 */
+    private AccessibilityNodeInfo findClickableAncestor(AccessibilityNodeInfo node,
+                                                        android.graphics.Rect nr) {
         AccessibilityNodeInfo clickTarget = null;
         List<AccessibilityNodeInfo> toRecycle = new ArrayList<>();
         AccessibilityNodeInfo cur = node;
@@ -1108,15 +1140,10 @@ public class SkipAccessibilityService extends AccessibilityService {
             }
             cur = p;
         }
-        if (clickTarget != null) {
-            clickTarget.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-            if (clickTarget != node) {
-                clickTarget.recycle();
-            }
-        }
         for (AccessibilityNodeInfo r : toRecycle) {
             r.recycle();
         }
+        return clickTarget;
     }
 
     /** 通过手势在屏幕坐标处模拟手指点按；成功返回 true。 */
@@ -1125,7 +1152,7 @@ public class SkipAccessibilityService extends AccessibilityService {
             Path path = new Path();
             path.moveTo(x, y);
             GestureDescription.Builder b = new GestureDescription.Builder();
-            b.addStroke(new GestureDescription.StrokeDescription(path, 0, 60));
+            b.addStroke(new GestureDescription.StrokeDescription(path, 0, 120));
             return dispatchGesture(b.build(), null, null);
         } catch (Exception e) {
             return false;
