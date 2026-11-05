@@ -1,6 +1,6 @@
 {
-  "versionCode": 57,
-  "versionName": "1.5.22",
-  "apkUrl": "https://gitee.com/stcbro/SilverShield/releases/download/v1.5.22-debug/SilverShield-v1.5.22.apk",
-  "notes": "① 修复反馈页被自己误点的 bug（自身界面防护加固+分享面板排除）；② 百度地图开屏跳过修复：手势点按加长到 120ms 并补一次控件点击双保险，规则补充跳过关键词。"
+  "versionCode": 59,
+  "versionName": "1.5.24",
+  "apkUrl": "https://gitee.com/stcbro/SilverShield/releases/download/v1.5.24-debug/SilverShield-v1.5.24.apk",
+  "notes": "① 修复系统分享面板一闪就关：排除系统分享/选择器窗口，不再被误扫误关；② 跳过按钮改为单次生效：新增控件指纹与完成态确认，去掉连点导致的按钮连闪与守护统计虚增；③ 百度地图开屏互动广告：扩充跳过控件规则与关键词；④ 首页精简：移除「提交反馈」入口。"
 }

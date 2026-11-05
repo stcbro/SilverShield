@@ -38,11 +38,6 @@
             android:name=".SettingsActivity"
             android:exported="false" />
 
-        <!-- 提交反馈：收集用户遇到的无效 App 与问题，便于补充规则/修复 -->
-        <activity
-            android:name=".FeedbackActivity"
-            android:exported="false" />
-
         <!-- 引导浮层：透明、触摸穿透，固定显示 2 秒后自动关闭 -->
         <activity
             android:name=".GuideOverlayActivity"

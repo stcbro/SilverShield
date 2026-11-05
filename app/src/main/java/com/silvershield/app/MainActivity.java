@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         TextView tvVersion = findViewById(R.id.tvVersion);
         tvVersion.setText("版本 v" + BuildConfig.VERSION_NAME
                 + "（规则 " + countRules() + " 条）");
-        // 点击版本号可查看运行诊断详情（截图发给开发者即可远程定位问题）
+        // 点击版本号可查看运行诊断详情（便于自行排查或截图留存）
         tvVersion.setOnClickListener(v -> showDiagnostics());
 
         // v1.4.1 起状态卡是纯显示开关（守护中↔已停止），与真实服务设置互不影响
@@ -72,8 +72,6 @@ public class MainActivity extends AppCompatActivity {
                 v -> startActivity(new Intent(this, StatsActivity.class)));
         findViewById(R.id.rowVoice).setOnClickListener(v -> speakGuide());
         findViewById(R.id.rowHelp).setOnClickListener(v -> showHelpDialog());
-        findViewById(R.id.rowFeedback).setOnClickListener(
-                v -> startActivity(new Intent(this, FeedbackActivity.class)));
 
         // 启动即调度规则自动检查（立即一次 + 每日定时）
         UpdateCheckWorker.schedule(this);
@@ -278,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    /** 运行诊断详情：把服务各环节状态展示出来，便于截图反馈。 */
+    /** 运行诊断详情：把服务各环节状态展示出来，便于排查问题。 */
     private void showDiagnostics() {
         boolean enabled = isServiceEnabled();
         boolean connected = SkipAccessibilityService.serviceConnected;

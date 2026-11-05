@@ -55,6 +55,14 @@ public class SkipAccessibilityService extends AccessibilityService {
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     /** 每个包最近一次“默认跳过”的时刻，避免同一包短时间内重复触发。 */
     private final Map<String, Long> lastDefaultSkip = new HashMap<>();
+    /** v1.5.23：跳过命中后的重试窗口——首次点击后 2.6 秒内无视冷却，允许补点。
+     *  百度地图开屏实测：按钮先渲染、触摸监听后挂上，首点经常被吞；靠补扫重试点中。 */
+    private final Map<String, Long> skipRetryUntil = new HashMap<>();
+    /** v1.5.24：每个包最近一次已点击的控件指纹（包名 + 控件 ID + 文案）。
+     *  没跳掉就补点、跳掉了就不再点——上一次点击是否奏效，靠“指纹是否还在”判断。 */
+    private final Map<String, String> lastSkipSig = new HashMap<>();
+    /** v1.5.24：上一次点击是否确认奏效（true=已跳过）。只在确认为“没跳掉”时才补点。 */
+    private final Map<String, Boolean> skipConfirmed = new HashMap<>();
     /** 每个包最近一次“广告窗口关闭”的时刻（去抖）。 */
     private final Map<String, Long> lastAdClose = new HashMap<>();
     /** 正在等待延迟重扫的包（去抖用），防止事件密集时反复提交。 */
@@ -141,9 +149,17 @@ public class SkipAccessibilityService extends AccessibilityService {
             "com.samsung.android.memo", "com.huawei.notepad", "com.hihonor.notepad",
             "com.coloros.note", "com.oppo.note", "com.vivo.notes", "com.heytap.note",
             "com.example.android.notepad",
-            // v1.5.22：系统分享面板 / 系统解析器窗口——点「发送反馈」弹出的分享面板
+            // v1.5.22：系统分享面板 / 系统解析器窗口——任何 App 分享内容时弹出的面板
             // 若被扫描，面板里的应用名/按钮可能被误点导致分享刚弹出就被关掉
-            "com.android.internal.app", "android", "com.miui.mishare.connectivity"
+            "com.android.internal.app", "android", "com.miui.mishare.connectivity",
+            // v1.5.23：系统分享面板真实包名（用户实测统计里全是 IntentResolver）
+            "com.android.intentresolver", "com.android.internal.intentresolver",
+            "android.intentresolver", "com.google.android.intentresolver",
+            "com.miui.intentresolver", "com.android.intentresolver.ui",
+            // v1.5.24：以下为实测确认的系统“应用选择 / 分享”面板包名（统计里出现过的全量补齐）
+            "com.android.internal.app.chooseractivity", "com.android.intentresolver.chooseractivity",
+            "com.android.chooser",
+            "com.miui.share", "com.miui.sharechooser", "com.android.intentresolver.chooser"
     ));
 
     private final BroadcastReceiver updateReceiver = new BroadcastReceiver() {
@@ -414,8 +430,16 @@ public class SkipAccessibilityService extends AccessibilityService {
             return 0;
         }
         // v1.5.22：本应用任何变体（含 debug 后缀 / 提示浮层窗口）一律不扫，
-        // 彻底杜绝“反馈页/说明页被自己点自己”的问题（v1.5.20 用户实测复现）
+        // 彻底杜绝“自家界面被自己点自己”的问题（v1.5.20 用户实测复现）
         if (pkg.contains("silvershield")) {
+            return 0;
+        }
+        // v1.5.23：系统分享/打开方式面板（IntentResolver）——任何 App 触发分享时，
+        // 面板里的应用列表被当成广告关掉，表现为“分享面板一闪就没了”。
+        // 该面板由系统渲染，包名固定为 android / com.android.intentresolver，必须整体排除。
+        if (pkg.equals("android")
+                || pkg.contains("intentresolver")
+                || pkg.startsWith("com.android.internal")) {
             return 0;
         }
         // 同一应用 300ms 内不重复全量扫描（事件风暴去抖）
@@ -464,16 +488,44 @@ public class SkipAccessibilityService extends AccessibilityService {
     private int applySkipById(AccessibilityNodeInfo root, String pkg) {
         long now = System.currentTimeMillis();
         Long last = lastDefaultSkip.get(pkg);
-        if (last != null && now - last < 1500) {
+        Long retryUntil = skipRetryUntil.get(pkg);
+        boolean retrying = retryUntil != null && now < retryUntil;
+        // v1.5.24：已确认跳掉的包，短时间内不再点第二下——
+        // 否则开屏广告跳转动画期间会连点 2~3 次，用户看到按钮连闪、日志重复计数。
+        // 窗口取 2 秒：足够覆盖开屏广告的生命周期，又不会拖到下一个广告。
+        if (last != null && Boolean.TRUE.equals(skipConfirmed.get(pkg)) && now - last < 2000) {
             return 0;
         }
-        AccessibilityNodeInfo target = dfsSkipId(root, root);
+        if (last != null && now - last < 400 && !retrying) {
+            return 0;
+        }
+        AccessibilityNodeInfo target = dfsSkipId(root, root, pkg);
         if (target == null) {
             return 0;
         }
         try {
+            String sig = sigOf(pkg, target);
+            boolean done = isDoneLike(target);
+            boolean sameAsLast = sig.equals(lastSkipSig.get(pkg));
+            // 同一按钮、上一轮已点过、现在还是“已跳过”态 → 是真跳掉了，停手。
+            // 若文案还在倒计时（sig 变化）说明上次点击被吞，继续补点。
+            if (done && sameAsLast) {
+                skipConfirmed.put(pkg, true);
+                if (BuildConfig.DEBUG) {
+                    Log.i("SilverShieldSkip", "已呈跳过完成态且指纹未变，停止补点");
+                }
+                return 0;
+            }
+            if (sameAsLast && retrying && BuildConfig.DEBUG) {
+                Log.i("SilverShieldSkip", "上次点击未生效，补点一次");
+            }
             performClick(target);
             lastDefaultSkip.put(pkg, now);
+            lastSkipSig.put(pkg, sig);
+            skipConfirmed.put(pkg, false);
+            if (retryUntil == null || now >= retryUntil) {
+                skipRetryUntil.put(pkg, now + 2600);
+            }
             if (BuildConfig.DEBUG) {
                 Log.i("SilverShieldSkip", "按ID命中skip控件");
             }
@@ -483,7 +535,24 @@ public class SkipAccessibilityService extends AccessibilityService {
         }
     }
 
-    private AccessibilityNodeInfo dfsSkipId(AccessibilityNodeInfo node, AccessibilityNodeInfo root) {
+    /** 控件指纹：包名 + 控件 ID + 文案，用于判断“上次点的还是不是同一个东西”。 */
+    private String sigOf(String pkg, AccessibilityNodeInfo node) {
+        String id = node.getViewIdResourceName();
+        CharSequence t = node.getText();
+        return pkg + "|" + (id != null ? id : "") + "|" + (t != null ? norm(t.toString()) : "");
+    }
+
+    /** 按钮是否已处于“已完成”状态（已跳过 / 已关闭）。 */
+    private boolean isDoneLike(AccessibilityNodeInfo node) {
+        String text = norm(node.getText() != null ? node.getText().toString() : "");
+        String desc = norm(node.getContentDescription() != null
+                ? node.getContentDescription().toString() : "");
+        return text.contains("已跳过") || text.contains("已关闭")
+                || desc.contains("已跳过") || desc.contains("已关闭");
+    }
+
+    private AccessibilityNodeInfo dfsSkipId(AccessibilityNodeInfo node, AccessibilityNodeInfo root,
+                                            String pkg) {
         if (node == null) {
             return null;
         }
@@ -492,7 +561,7 @@ public class SkipAccessibilityService extends AccessibilityService {
             if (c == null) {
                 continue;
             }
-            AccessibilityNodeInfo found = dfsSkipId(c, root);
+            AccessibilityNodeInfo found = dfsSkipId(c, root, pkg);
             if (found != null) {
                 return found;
             }
@@ -511,6 +580,15 @@ public class SkipAccessibilityService extends AccessibilityService {
                 node.getBoundsInScreen(r);
                 if (!done && r.width() > 0 && r.height() > 0) {
                     return node;
+                }
+                // v1.5.24：按钮已呈“已跳过”态但控件还在——只在上一次点击没生效时（仍在重试窗口内）
+                // 才返回它继续补点，否则视为已跳完，返回 null 让整棵树的扫描停在这里。
+                if (done && r.width() > 0 && r.height() > 0
+                        && sigOf(pkg, node).equals(lastSkipSig.get(pkg))) {
+                    Long until = skipRetryUntil.get(pkg);
+                    if (until != null && System.currentTimeMillis() < until) {
+                        return node;
+                    }
                 }
             }
         }
@@ -783,9 +861,13 @@ public class SkipAccessibilityService extends AccessibilityService {
     private int applyDefaultSkip(AccessibilityNodeInfo root, String pkg) {
         long now = System.currentTimeMillis();
         Long last = lastDefaultSkip.get(pkg);
+        Long retryUntil = skipRetryUntil.get(pkg);
+        boolean retrying = retryUntil != null && now < retryUntil;
         // v1.4.8：冷却 500ms → 2000ms。真实广告点一次就够，冷却太短时
         // 界面没变化会反复补点（小米笔记误伤时 1 秒内连点 4~5 次）
-        if (last != null && now - last < 2000) {
+        // v1.5.23：命中后 2.6 秒内进入重试窗口，冷却放宽到 700ms——
+        // 百度地图开屏实测首点被吞（按钮可见但触摸监听未就绪），需补点才生效。
+        if (last != null && now - last < (retrying ? 700 : 2000)) {
             return 0; // 同一包短时间内不重复触发，避免抖动
         }
         int clicks = 0;
@@ -803,6 +885,10 @@ public class SkipAccessibilityService extends AccessibilityService {
         }
         if (clicks > 0) {
             lastDefaultSkip.put(pkg, now);
+            // 首次命中开启 2.6 秒重试窗口；窗口内补点不延长窗口
+            if (retryUntil == null || now >= retryUntil) {
+                skipRetryUntil.put(pkg, now + 2600);
+            }
         }
         return clicks;
     }
@@ -1093,16 +1179,16 @@ public class SkipAccessibilityService extends AccessibilityService {
             if (BuildConfig.DEBUG) {
                 Log.i("SilverShieldSkip", "手势点按已派发");
             }
-            // v1.5.22：跳过路径双保险——手势之外再补一次 ACTION_CLICK。
-            // 部分广告 SDK（百度地图开屏实测）对手势不响应、只认控件点击事件；
-            // 跳过按钮连点两次无副作用，弹窗关闭路径保持只用手势防止误触。
+            // v1.5.22：跳过路径双保险——手势之外再补一次控件点击。
+            // 部分广告 SDK（百度地图开屏实测）对手势不响应、只认点击事件。
+            // v1.5.24 修正：这里用“一次手势点按”代替 ACTION_CLICK——
+            //  ① 不改变界面上接收的是“真实触摸”，对只挂 OnTouchListener 的按钮照样有效；
+            //  ② 不会像 ACTION_CLICK 那样往“可点击祖先”（按钮内部会把手势转成 performClick）
+            //     重复派发一次，导致日志里同一个按钮连续记录两次跳过。
             if (!block) {
-                AccessibilityNodeInfo extra = findClickableAncestor(node, nr);
-                if (extra != null) {
-                    extra.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                    if (extra != node) {
-                        extra.recycle();
-                    }
+                clickAt(nr.exactCenterX(), nr.exactCenterY());
+                if (BuildConfig.DEBUG) {
+                    Log.i("SilverShieldSkip", "第二击已派发（双保险）");
                 }
             }
             return;

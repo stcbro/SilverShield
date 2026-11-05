@@ -46,7 +46,7 @@ public final class ToastUtil {
         if (canOverlay(appCtx) && showOverlay(appCtx, msg)) {
             return;
         }
-        // 悬浮窗不可用（未授权/异常）：降级为标准 Toast，保证至少有反馈。
+        // 悬浮窗不可用（未授权/异常）：降级为标准 Toast，保证至少有提示。
         try {
             Toast.makeText(appCtx, "🛡️ " + msg, Toast.LENGTH_LONG).show();
         } catch (Throwable ignored) {
